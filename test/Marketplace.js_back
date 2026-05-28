@@ -1,0 +1,172 @@
+// test/Marketplace.js
+
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
+
+describe("Marketplace", function () {
+  let NFT;
+  let Marketplace;
+  let nft;
+  let marketplace;
+
+  let deployer;
+  let seller;
+  let buyer;
+
+  const feePercent = 1;
+  const tokenURI = "https://example.com/metadata/1.json";
+
+  let price;
+
+  beforeEach(async function () {
+    [deployer, seller, buyer] = await ethers.getSigners();
+
+    price = ethers.parseEther("1");
+
+    NFT = await ethers.getContractFactory("NFT");
+    nft = await NFT.deploy();
+    await nft.waitForDeployment();
+
+    Marketplace = await ethers.getContractFactory("Marketplace");
+    marketplace = await Marketplace.deploy(feePercent);
+    await marketplace.waitForDeployment();
+
+    // seller mints NFT
+    await nft.connect(seller).mint(tokenURI);
+
+    // seller approves marketplace to transfer tokenId 1
+    await nft.connect(seller).approve(marketplace.address, 1);
+  });
+
+  describe("Deployment", function () {
+    it("sets the fee account to deployer", async function () {
+//      expect(await marketplace.feeAccount()).to.equal(deployer.address);
+    });
+
+    it("sets the fee percent", async function () {
+//      expect(await marketplace.feePercent()).to.equal(feePercent);
+    });
+
+    it("starts with itemCount of 0", async function () {
+      expect(await marketplace.itemCount()).to.equal(0);
+    });
+  });
+
+  describe("Making marketplace items", function () {
+    it("allows a seller to list an NFT", async function () {
+      await expect(
+        marketplace.connect(seller).makeItem(nft.address, 1, price)
+      )
+        .to.emit(marketplace, "Offered")
+        .withArgs(
+          1,
+          nft.address,
+          1,
+          price,
+          seller.address
+        );
+
+      expect(await marketplace.itemCount()).to.equal(1);
+
+      const item = await marketplace.items(1);
+
+      expect(item.itemId).to.equal(1);
+      expect(item.nft).to.equal(nft.address);
+      expect(item.tokenId).to.equal(1);
+      expect(item.price).to.equal(price);
+      expect(item.seller).to.equal(seller.address);
+      expect(item.sold).to.equal(false);
+
+      expect(await nft.ownerOf(1)).to.equal(marketplace.address);
+    });
+
+    it("reverts if price is zero", async function () {
+      await expect(
+        marketplace.connect(seller).makeItem(nft.address, 1, 0)
+      ).to.be.revertedWith("Price must be greater than zero");
+    });
+
+    it("reverts if seller has not approved marketplace", async function () {
+      await nft.connect(seller).mint("https://example.com/metadata/2.json");
+
+      await expect(
+        marketplace.connect(seller).makeItem(nft.address, 2, price)
+      ).to.be.reverted;
+    });
+
+    it("increments itemCount after listing", async function () {
+      await marketplace.connect(seller).makeItem(nft.address, 1, price);
+
+      expect(await marketplace.getItemCount()).to.equal(1);
+    });
+  });
+
+  describe("Purchasing marketplace items", function () {
+    beforeEach(async function () {
+      await marketplace.connect(seller).makeItem(nft.address, 1, price);
+    });
+
+    it("calculates total price correctly", async function () {
+      const totalPrice = await marketplace.getTotalPrice(1);
+
+      const expectedTotalPrice = price.mul(100 + feePercent).div(100);
+
+      expect(totalPrice).to.equal(expectedTotalPrice);
+    });
+
+    it("allows buyer to purchase an item", async function () {
+      const totalPrice = await marketplace.getTotalPrice(1);
+
+      await expect(
+        marketplace.connect(buyer).purchaseItem(1, { value: totalPrice })
+      )
+        .to.emit(marketplace, "Bought")
+        .withArgs(
+          1,
+          nft.address,
+          1,
+          price,
+          seller.address,
+          buyer.address
+        );
+
+      const item = await marketplace.items(1);
+
+      expect(item.sold).to.equal(true);
+      expect(await nft.ownerOf(1)).to.equal(buyer.address);
+    });
+
+    it("transfers payment to seller and feeAccount", async function () {
+      const totalPrice = await marketplace.getTotalPrice(1);
+
+      await expect(
+        marketplace.connect(buyer).purchaseItem(1, { value: totalPrice })
+      ).to.changeEtherBalances(
+        [seller, deployer],
+        [price, totalPrice.sub(price)]
+      );
+    });
+
+    it("reverts if item does not exist", async function () {
+      await expect(
+        marketplace.connect(buyer).purchaseItem(999, {
+          value: ethers.utils.parseEther("2"),
+        })
+      ).to.be.revertedWith("item doesn't exist");
+    });
+
+    it("reverts if item is already sold", async function () {
+      const totalPrice = await marketplace.getTotalPrice(1);
+
+      await marketplace.connect(buyer).purchaseItem(1, {
+        value: totalPrice,
+      });
+
+      await expect(
+        marketplace.connect(buyer).purchaseItem(1, {
+          value: totalPrice,
+        })
+      ).to.be.revertedWith("item already sold");
+    });
+  });
+});

@@ -1,0 +1,56 @@
+// test/Marketplace.js
+
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
+
+describe("Marketplace", function () {
+  let NFT;
+  let Marketplace;
+  let nft;
+  let marketplace;
+
+  let deployer;
+  let seller;
+  let buyer;
+
+  const feePercent = 1;
+  const tokenURI = "https://example.com/metadata/1.json";
+
+  let price;
+
+  beforeEach(async function () {
+    [deployer, seller, buyer] = await ethers.getSigners();
+
+    price = ethers.parseEther("1");
+
+    NFT = await ethers.getContractFactory("NFT");
+    nft = await NFT.deploy();
+    //await nft.waitForDeployment();
+
+    Marketplace = await ethers.getContractFactory("Marketplace");
+    marketplace = await Marketplace.deploy(feePercent);
+    //await marketplace.waitForDeployment();
+
+    // seller mints NFT
+    await nft.connect(seller).mint(tokenURI);
+
+    // seller approves marketplace to transfer tokenId 1
+    const marketplaceAddress = await marketplace.getAddress(); 
+    await nft.connect(seller).approve(marketplaceAddress, 1);
+  });
+
+  describe("Deployment", function () {
+    it("sets the fee account to deployer", async function () {
+      expect(await marketplace.feeAccount()).to.equal(deployer.address);
+    });
+
+    it("sets the fee percent", async function () {
+      expect(await marketplace.feePercent()).to.equal(feePercent);
+    });
+
+    it("starts with itemCount of 0", async function () {
+      expect(await marketplace.itemCount()).to.equal(0);
+    });
+  });
+
+});
