@@ -1,0 +1,58 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1) set hardhat config file
+2) run remote blockchain
+3) fire up the console......
+
+
+
+
+edit the hardhat config file.
+
+
+
+/home/ubuntu/hello   npx hardhat node --hostname ec2-35-86-73-162.us-west-2.compute.amazonaws.com
+/home/ubuntu/hello npx   hardhat run scripts/deploy.js --network localhost
+
+# test from hardhat console
+
+npx hardhat console --network localhost
+
+> const feePercent= 1
+undefined
+> const tokenURI = "https://example.com/metadata/1.json";
+undefined
+> const [deployer, seller, buyer] = await ethers.getSigners();
+undefined
+> const NFT =  await ethers.getContractFactory("NFT")
+undefined
+> let price = ethers.parseEther("1")
+undefined
+> const nft = await NFT.deploy()
+undefined
+> const Marketplace =  await ethers.getContractFactory("Marketplace")
+undefined
+> const marketplace = await Marketplace.deploy(feePercent)
+undefined
+> marketplaceAddress = await marketplace.getAddress();
+'0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+> marketplaceAddress
+'0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+>
+
+> await nft.connect(seller).mint(tokenURI)
+
+> await nft.connect(seller).approve(marketplaceAddress, 1);
