@@ -66,6 +66,17 @@ undefined
 > 0
 0
 >
+> nft.address
+undefined
+> let nftAddress = await nft.getAddress()
+undefined
+> nftAddress
+'0x5FbDB2315678afecb367f032d93F642f64180aa3'
+> marketplace.connect(seller).makeItem(nftAddress, 1, price)
+Promise {
+  <pending>,
+  [Symbol(async_id_symbol)]: 6845,
+  [Symbol(trigger_async_id_symbol)]: 14
 
 >
 
