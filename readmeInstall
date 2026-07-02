@@ -114,3 +114,6 @@ Result(6) [
 
 
 >
+> await marketplace.connect(buyer).purchaseItem(999, { value: ethers.parseEther("2"), } )
+Uncaught:
+ProviderError: Error: VM Exception while processing transaction: reverted with reason string 'item doesn't exist'
