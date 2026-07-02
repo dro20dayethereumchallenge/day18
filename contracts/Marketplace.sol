@@ -100,26 +100,9 @@ contract Marketplace is ReentrancyGuard {
         );
     }
     
-
-    // maybe i have to pass money here iwth the send function
     function getTotalPrice(uint _itemId) view public returns(uint){
        return((items[_itemId].price*(100 + feePercent))/100);
-// not work.          return(.0001);
-//  return((items[_itemId].price*(100 + feePercent))/10000);
     }
-
-    function setTotalPriceTwo(uint _itemId) public{
-       tPrice =  (items[_itemId].price*(100 + feePercent))/100;
-    }
-
-
-    function getTotalPriceTwo() view public returns(uint){
-       return(tPrice);
-    }
-
-
-
-
 
 //    uint public itemCount;
     function getItemCount() public view returns(uint){
