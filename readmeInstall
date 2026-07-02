@@ -11,6 +11,22 @@
 
 
 
+npx hardhat init
+
+# double check dns
+vi hardhat.config.js
+
+vi contracts/Hello.sol
+
+# double check dns
+vi src/App.js
+
+# from project directory
+mkdir scripts       
+vi scripts/deploy.js
+
+
+
 
 
 1) set hardhat config file
