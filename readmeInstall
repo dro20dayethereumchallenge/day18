@@ -78,4 +78,39 @@ undefined
 > await nft.connect(seller).approve(marketplaceAddress, 1);
 > await marketplace.connect(seller).makeItem(nftAddress, 1, price)
 
+
+
+await nft.connect( seller ).mint("https://example.com/metadta/2.json")
+
+> await nft.connect( seller ).approve(marketplaceAddress, 2)
+> await nft.connect( seller ).mint("https://example.com/metadta/2.json")
+> await marketplace.connect(seller).makeItem(nftAddress, 1, price)
+
+> const totalPrice = await marketplace.getTotalPrice(1)
+
+> await marketplace.connect(buyer).purchaseItem( 1, { value: totalPrice })
+> await marketplace.items(1)
+Result(6) [
+  1n,
+  '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+  1n,
+  1000000000000000000n,
+  '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+  true
+]
+> await marketplace.items(2)
+Result(6) [
+  2n,
+  '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+  2n,
+  1000000000000000000n,
+  '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+  false
+]
+> await marketplace.getTotalPrice(1)
+1010000000000000000n
+
+
+
+
 >
