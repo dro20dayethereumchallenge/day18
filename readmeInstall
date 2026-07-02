@@ -22,9 +22,6 @@ npx hardhat init
 
 
 
-
-
-
 npx hardhat init
 
 # double check dns
