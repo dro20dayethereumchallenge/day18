@@ -94,7 +94,7 @@ await nft.connect( seller ).mint("https://example.com/metadta/2.json")
 
 > await nft.connect( seller ).approve(marketplaceAddress, 2)
 > await nft.connect( seller ).mint("https://example.com/metadta/2.json")
-> await marketplace.connect(seller).makeItem(nftAddress, 1, price)
+> await marketplace.connect(seller).makeItem(nftAddress, 2, price)
 
 > const totalPrice = await marketplace.getTotalPrice(1)
 
