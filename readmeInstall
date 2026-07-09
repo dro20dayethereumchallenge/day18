@@ -14,16 +14,6 @@ npx create-react-app nftmarket
 cd nftmarket/
 npx hardhat init
 
-
-
-
-
-
-
-
-
-npx hardhat init
-
 # double check dns
 vi hardhat.config.js
 
@@ -40,16 +30,9 @@ vi scripts/deploy.js
 
 
 
-1) set hardhat config file
+# set hardhat config file - to your 'dns' every time you restart instance
 2) run remote blockchain
 3) fire up the console......
-
-
-
-
-edit the hardhat config file.
-
-
 
 /home/ubuntu/hello   npx hardhat node --hostname ec2-35-86-73-162.us-west-2.compute.amazonaws.com
 /home/ubuntu/hello npx   hardhat run scripts/deploy.js --network localhost
