@@ -54,9 +54,6 @@ contract Marketplace is ReentrancyGuard {
         itemCount ++;
         // transfer nft
         _nft.transferFrom(msg.sender, address(this), _tokenId);
-        // add new item to items mapping
-//  remove payable(msg.sender),
-
 
         items[itemCount] = Item (
             itemCount,
@@ -103,8 +100,6 @@ contract Marketplace is ReentrancyGuard {
     function getTotalPrice(uint _itemId) view public returns(uint){
        return((items[_itemId].price*(100 + feePercent))/100);
     }
-
-//    uint public itemCount;
     function getItemCount() public view returns(uint){
         return itemCount;
     }
